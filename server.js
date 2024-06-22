@@ -9,11 +9,11 @@ const URL = "mongodb+srv://nethhari:Chemma%40mongodb@cluster0.6co1avu.mongodb.ne
 app.use(bodyParser.json());
 
 mongoose.connect(URL)
-    .then(() => {
+/*    .then(() => {
         console.log("Connected")
     })
     .catch((e) => {
         console.log("DB error", e)
-    })
+    })  */
 
 app.listen(PORT, () => console.log("Server is up"));
