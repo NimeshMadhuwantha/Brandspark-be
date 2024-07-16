@@ -13,8 +13,8 @@
   "dependencies": {
     "bcrypt": "^5.1.1",
     "express": "^4.19.2",
-    "mongodb": "^6.7.0",
-    "mongoose": "^8.4.3"
+    "mongodb": "^6.8.0",
+    "mongoose": "^8.5.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"
