@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
 const expertSchema = new mongoose.Schema({
@@ -21,15 +21,15 @@ const expertSchema = new mongoose.Schema({
         required: true,
         minlength: [8, 'Password must be at least 8 characters long'],
         validate: {
-            validator: function(v) {
-                return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/.test(v);
+            validator: function (v) {
+                return /^(?=.*[a-z])(?=.*[A-Z])(?=.*[d]).+$/.test(v);
             },
             message: 'Password must contain at least one lowercase letter, one uppercase letter, and one number'
         }
     }
 });
 
-expertSchema.pre('save', async function(next) {
+expertSchema.pre('save', async function (next) {
     if (this.isModified('password') || this.isNew) {
         this.password = await bcrypt.hash(this.password, 10);
     }
@@ -38,4 +38,4 @@ expertSchema.pre('save', async function(next) {
 
 const Expert = mongoose.model('Expert', expertSchema);
 
-module.exports = Expert;
+export default Expert;

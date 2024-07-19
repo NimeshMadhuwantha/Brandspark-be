@@ -1,15 +1,14 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
-const customerSchema = mongoose.Schema({
-
+const customerSchema = new mongoose.Schema({
     firstName: {
         type: String,
-        required: true 
+        required: true
     },
     secondName: {
         type: String,
-        required: true 
+        required: true
     },
     email: {
         type: String,
@@ -23,17 +22,15 @@ const customerSchema = mongoose.Schema({
         required: true,
         minlength: [8, 'Password must be at least 8 characters long'],
         validate: {
-            validator: function(v) {
+            validator: function (v) {
                 return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/.test(v);
             },
             message: 'Password must contain at least one lowercase letter, one uppercase letter, and one number'
         }
     }
-
 });
 
-customerSchema.pre('save', async function(next) {
-
+customerSchema.pre('save', async function (next) {
     if (this.isModified('password') || this.isNew) {
         try {
             const salt = await bcrypt.genSalt(10);
@@ -49,4 +46,4 @@ customerSchema.pre('save', async function(next) {
 
 const Customer = mongoose.model('Customer', customerSchema);
 
-module.exports = Customer;
+export default Customer;
