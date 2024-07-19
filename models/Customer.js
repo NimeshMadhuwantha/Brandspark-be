@@ -30,7 +30,7 @@ const customerSchema = new mongoose.Schema({
     }
 });
 
-customerSchema.pre('save', async function (next) {
+customerSchema.pre('save', async function(next) {
     if (this.isModified('password') || this.isNew) {
         try {
             const salt = await bcrypt.genSalt(10);
