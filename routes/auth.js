@@ -11,7 +11,7 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Signup route
 router.post('/signup', async (req, res) => {
-    const { firstName, secondName, email, password } = req.body;
+    const { firstName, lastName, email, password } = req.body;
 
     try {
         let customer = await Customer.findOne({ email });
@@ -22,7 +22,7 @@ router.post('/signup', async (req, res) => {
 
         customer = new Customer({
             firstName,
-            secondName,
+            lastName,
             email,
             password
         });
@@ -105,7 +105,7 @@ router.post('/google', async (req, res) => {
         if (!customer) {
             customer = new Customer({
                 firstName: name.split(' ')[0],
-                secondName: name.split(' ')[1],
+                lastName: name.split(' ')[1],
                 email,
                 password: 'google-auth'
             });
