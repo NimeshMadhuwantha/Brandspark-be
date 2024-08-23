@@ -1,14 +1,14 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
 const customerSchema = new mongoose.Schema({
     firstName: {
         type: String,
-        required: true 
+        required: true
     },
-    secondName: {
+    lastName: {
         type: String,
-        required: true 
+        required: true
     },
     email: {
         type: String,
@@ -22,7 +22,7 @@ const customerSchema = new mongoose.Schema({
         required: true,
         minlength: [8, 'Password must be at least 8 characters long'],
         validate: {
-            validator: function(v) {
+            validator: function (v) {
                 return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/.test(v);
             },
             message: 'Password must contain at least one lowercase letter, one uppercase letter, and one number'
