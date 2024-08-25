@@ -9,6 +9,44 @@ const router = express.Router();
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+// Login route
+router.post('/login', async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const customer = await Customer.findOne({ email });
+
+        if (!customer) {
+            return res.status(400).json({ msg: 'Invalid Credentials' });
+        }
+
+        const isMatch = await bcrypt.compare(password, customer.password);
+
+        if (!isMatch) {
+            return res.status(400).json({ msg: 'Invalid Credentials' });
+        }
+
+        const payload = {
+            customer: {
+                id: customer.id
+            }
+        };
+
+        jwt.sign(
+            payload,
+            process.env.JWT_SECRET,
+            { expiresIn: 3600 },
+            (err, token) => {
+                if (err) throw err;
+                res.json({ token, customer: { firstName: customer.firstName, lastName: customer.lastName, email: customer.email } });
+            }
+        );
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error');
+    }
+});
+
 // Signup route
 router.post('/signup', async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
@@ -41,52 +79,15 @@ router.post('/signup', async (req, res) => {
             { expiresIn: 3600 },
             (err, token) => {
                 if (err) throw err;
-                res.json({ token });
+                res.json({ token, customer: { firstName: customer.firstName, lastName: customer.lastName, email: customer.email } });
             }
         );
-    } catch (err) {
+    } catch (err) { 
         console.error(err.message);
         res.status(500).send('Server error');
     }
 });
 
-// Login route
-router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-
-    try {
-        const customer = await Customer.findOne({ email });
-
-        if (!customer) {
-            return res.status(400).json({ msg: 'Invalid Credentials' });
-        }
-
-        const isMatch = await bcrypt.compare(password, customer.password);
-
-        if (!isMatch) {
-            return res.status(400).json({ msg: 'Invalid Credentials' });
-        }
-
-        const payload = {
-            customer: {
-                id: customer.id
-            }
-        };
-
-        jwt.sign(
-            payload,
-            process.env.JWT_SECRET,
-            { expiresIn: 3600 },
-            (err, token) => {
-                if (err) throw err;
-                res.json({ token });
-            }
-        );
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server error');
-    }
-});
 
 // Google Auth route
 router.post('/google', async (req, res) => {
