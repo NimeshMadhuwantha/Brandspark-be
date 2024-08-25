@@ -1,19 +1,22 @@
 import express from 'express';
-import bodyParser from 'body-parser';
-import mongoose from 'mongoose';
+import connectDB from './config/db.js';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import authRoutes from './routes/auth.js';
+
+dotenv.config();
 
 const app = express();
-const PORT = 5000;
-const URL = "mongodb+srv://nethhari:Chemma%40mongodb@cluster0.6co1avu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
-app.use(bodyParser.json());
+connectDB();
 
-mongoose.connect(URL)
-/*    .then(() => {
-        console.log("Connected")
-    })
-    .catch((e) => {
-        console.log("DB error", e)
-    })  */
+app.use(express.json());
+app.use(cors());
 
-app.listen(PORT, () => console.log("Server is up"));
+app.get('/', (req, res) => res.send('API Running'));
+
+app.use('/api/auth', authRoutes);
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
