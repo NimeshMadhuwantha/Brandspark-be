@@ -7,6 +7,9 @@ import Customer from '../models/Customer.js';
 const router = express.Router();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+// Define a constant for the login image URL
+const LOGIN_IMAGE_URL = '../../assets/login.png';
+
 // Login route
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
@@ -42,7 +45,7 @@ router.post('/login', async (req, res) => {
                         firstName: customer.firstName,
                         lastName: customer.lastName,
                         email: customer.email,
-                        image: customer.image || '../../assets/logo2.png' // Include image URL
+                        image: LOGIN_IMAGE_URL // Use the constant image URL
                     }
                 });
             }
@@ -54,7 +57,7 @@ router.post('/login', async (req, res) => {
 
 // Signup route
 router.post('/signup', async (req, res) => {
-    const { firstName, lastName, email, password, image } = req.body;
+    const { firstName, lastName, email, password } = req.body;
 
     try {
         let customer = await Customer.findOne({ email });
@@ -67,8 +70,7 @@ router.post('/signup', async (req, res) => {
             firstName,
             lastName,
             email,
-            password,
-            image:'../../assets/logo2.png' // Save the image URL
+            password
         });
 
         const salt = await bcrypt.genSalt(10);
@@ -94,7 +96,7 @@ router.post('/signup', async (req, res) => {
                         firstName: customer.firstName,
                         lastName: customer.lastName,
                         email: customer.email,
-                        image: customer.image // Include image URL
+                        image: LOGIN_IMAGE_URL // Use the constant image URL
                     }
                 });
             }
@@ -123,8 +125,7 @@ router.post('/google', async (req, res) => {
                 firstName: name.split(' ')[0],
                 lastName: name.split(' ')[1],
                 email,
-                password: 'google-auth',
-                image: 'google_image_url.png' // Save Google profile image URL
+                password: 'google-auth'
             });
 
             await customer.save();
@@ -142,7 +143,15 @@ router.post('/google', async (req, res) => {
             { expiresIn: 3600 },
             (err, token) => {
                 if (err) throw err;
-                res.json({ token });
+                res.json({
+                    token,
+                    customer: {
+                        firstName: customer.firstName,
+                        lastName: customer.lastName,
+                        email: customer.email,
+                        image: LOGIN_IMAGE_URL // Use the constant image URL
+                    }
+                });
             }
         );
     } catch (err) {
