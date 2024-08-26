@@ -7,8 +7,19 @@ import Customer from '../models/Customer.js';
 const router = express.Router();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-// Define a constant for the login image URL
-const LOGIN_IMAGE_URL = '../../assets/login.png';
+// Middleware to authenticate and get user from token
+const authMiddleware = (req, res, next) => {
+    const token = req.header('x-auth-token');
+    if (!token) return res.status(401).json({ msg: 'No token, authorization denied' });
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded.customer;
+        next();
+    } catch (err) {
+        res.status(401).json({ msg: 'Token is not valid' });
+    }
+};
 
 // Login route
 router.post('/login', async (req, res) => {
@@ -44,8 +55,7 @@ router.post('/login', async (req, res) => {
                     customer: {
                         firstName: customer.firstName,
                         lastName: customer.lastName,
-                        email: customer.email,
-                        image: LOGIN_IMAGE_URL // Use the constant image URL
+                        email: customer.email
                     }
                 });
             }
@@ -95,8 +105,7 @@ router.post('/signup', async (req, res) => {
                     customer: {
                         firstName: customer.firstName,
                         lastName: customer.lastName,
-                        email: customer.email,
-                        image: LOGIN_IMAGE_URL // Use the constant image URL
+                        email: customer.email
                     }
                 });
             }
@@ -107,7 +116,7 @@ router.post('/signup', async (req, res) => {
 });
 
 // Google Auth route
-router.post('/google', async (req, res) => {
+router.post('/google', async (req, res) => { 
     const { tokenId } = req.body;
 
     try {
@@ -148,12 +157,27 @@ router.post('/google', async (req, res) => {
                     customer: {
                         firstName: customer.firstName,
                         lastName: customer.lastName,
-                        email: customer.email,
-                        image: LOGIN_IMAGE_URL // Use the constant image URL
+                        email: customer.email
                     }
                 });
             }
         );
+    } catch (err) {
+        res.status(500).send('Server error');
+    }
+});
+
+// Protected route to get user info
+router.get('/me', authMiddleware, async (req, res) => {
+    try {
+        const customer = await Customer.findById(req.user.id);
+        if (!customer) return res.status(404).json({ msg: 'User not found' });
+
+        res.json({
+            firstName: customer.firstName,
+            lastName: customer.lastName,
+            email: customer.email
+        });
     } catch (err) {
         res.status(500).send('Server error');
     }
