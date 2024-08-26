@@ -3,10 +3,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 import Customer from '../models/Customer.js';
-import Expert from '../models/Expert.js';
 
 const router = express.Router();
-
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Login route
@@ -38,18 +36,25 @@ router.post('/login', async (req, res) => {
             { expiresIn: 3600 },
             (err, token) => {
                 if (err) throw err;
-                res.json({ token, customer: { firstName: customer.firstName, lastName: customer.lastName, email: customer.email } });
+                res.json({
+                    token,
+                    customer: {
+                        firstName: customer.firstName,
+                        lastName: customer.lastName,
+                        email: customer.email,
+                        image: customer.image || '../../assets/logo2.png' // Include image URL
+                    }
+                });
             }
         );
     } catch (err) {
-        console.error(err.message);
         res.status(500).send('Server error');
     }
 });
 
 // Signup route
 router.post('/signup', async (req, res) => {
-    const { firstName, lastName, email, password } = req.body;
+    const { firstName, lastName, email, password, image } = req.body;
 
     try {
         let customer = await Customer.findOne({ email });
@@ -62,8 +67,12 @@ router.post('/signup', async (req, res) => {
             firstName,
             lastName,
             email,
-            password
+            password,
+            image:'../../assets/logo2.png' // Save the image URL
         });
+
+        const salt = await bcrypt.genSalt(10);
+        customer.password = await bcrypt.hash(password, salt);
 
         await customer.save();
 
@@ -79,15 +88,21 @@ router.post('/signup', async (req, res) => {
             { expiresIn: 3600 },
             (err, token) => {
                 if (err) throw err;
-                res.json({ token, customer: { firstName: customer.firstName, lastName: customer.lastName, email: customer.email } });
+                res.json({
+                    token,
+                    customer: {
+                        firstName: customer.firstName,
+                        lastName: customer.lastName,
+                        email: customer.email,
+                        image: customer.image // Include image URL
+                    }
+                });
             }
         );
-    } catch (err) { 
-        console.error(err.message);
+    } catch (err) {
         res.status(500).send('Server error');
     }
 });
-
 
 // Google Auth route
 router.post('/google', async (req, res) => {
@@ -108,7 +123,8 @@ router.post('/google', async (req, res) => {
                 firstName: name.split(' ')[0],
                 lastName: name.split(' ')[1],
                 email,
-                password: 'google-auth'
+                password: 'google-auth',
+                image: 'google_image_url.png' // Save Google profile image URL
             });
 
             await customer.save();
@@ -130,7 +146,6 @@ router.post('/google', async (req, res) => {
             }
         );
     } catch (err) {
-        console.error(err.message);
         res.status(500).send('Server error');
     }
 });
