@@ -16,9 +16,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// @route   POST /api/brandidentity/submit
-// @desc    Submit brand identity form
-// @access  Public
+// Submit brand identity form
 router.post('/submit', upload.single('logo'), async (req, res) => {
     const { brandName, category, suggestions, need } = req.body;
 
@@ -43,9 +41,7 @@ router.post('/submit', upload.single('logo'), async (req, res) => {
     }
 });
 
-// @route   GET /api/brandidentity
-// @desc    Get all brand identity submissions
-// @access  Admin
+// Get all brand identity submissions
 router.get('/', async (req, res) => {
     try {
         const brandIdentities = await BrandIdentity.find().sort({ createdAt: -1 }); // Sorted by most recent
@@ -56,9 +52,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-// @route   GET /api/brandidentity/:id
-// @desc    Get a single brand identity submission by ID
-// @access  Admin
+// Get a single brand identity submission by ID
 router.get('/:id', async (req, res) => {
     try {
         const brandIdentity = await BrandIdentity.findById(req.params.id);
@@ -77,9 +71,7 @@ router.get('/:id', async (req, res) => {
 });
 
 
-// @route   DELETE /api/brandidentity/:id
-// @desc    Delete a brand identity submission by ID
-// @access  Admin
+// Delete a brand identity submission by ID
 router.delete('/:id', async (req, res) => {
     try {
         const brandIdentity = await BrandIdentity.findById(req.params.id);

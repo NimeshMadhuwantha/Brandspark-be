@@ -8,7 +8,7 @@ const brandIdentitySchema = new mongoose.Schema({
     },
     logo: {
         type: String,
-        required: [true, 'Logo is required'], // Store file path or URL for the logo
+        required: [true, 'Logo is required'], 
     },
     category: {
         type: String,
@@ -21,7 +21,7 @@ const brandIdentitySchema = new mongoose.Schema({
             'Technology',
             'Food',
             'Other',
-        ], // Ensures the value is one of the predefined categories
+        ], 
     },
     suggestions: {
         type: String,

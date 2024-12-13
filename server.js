@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
 import authRoutes from './routes/auth.js';
-import brandIdentityRoutes from './routes/BrandIdentity.js'; // Import brand identity routes
+import brandIdentityRoutes from './routes/BrandIdentity.js'; 
 
 dotenv.config();
 
